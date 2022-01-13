@@ -1,14 +1,13 @@
 mod beat;
-mod optimize;
-mod simulate;
+mod model;
 
 pub mod prelude {
     // macro
     pub use crate::beat;
 
     // model
-    // pub use crate::optimizer::OptTraitFix;
-    pub use crate::simulate::SimModelTraitFix;
+    pub use crate::model::{FixModelOptTrait, FlexModelOptTrait, OdeModelOptTrait};
+    pub use crate::model::{FixModelSimTrait, FlexModelSimTrait, OdeModelSimTrait};
     pub use core::str::FromStr;
     pub use rust_decimal::Decimal;
 }

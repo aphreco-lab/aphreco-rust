@@ -14,7 +14,7 @@ const LEN_P: usize = 11;
 const LEN_B: usize = 2;
 
 #[allow(dead_code)]
-impl SimModelTraitFix<LEN_Y, LEN_P, LEN_B> for Model {
+impl FixModelSimTrait<LEN_Y, LEN_P, LEN_B> for Model {
   fn new() -> Self {
     let p = [
       0.1,   // p[0] k12

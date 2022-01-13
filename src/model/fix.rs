@@ -1,13 +1,32 @@
-pub trait OptTraitFlex<const LEN_Y: usize, const LEN_P: usize, const LEN_X: usize>:
-  FlexModelSimTrait<LEN_Y, LEN_P>
-{
+use rust_decimal::Decimal;
+
+pub trait FixModelSimTrait<const LEN_Y: usize, const LEN_P: usize, const LEN_B: usize> {
+  fn new() -> Self;
+  fn init(&self) -> (f64, [f64; LEN_Y]);
+  fn ode(&self, t: &f64, y: &[f64; LEN_Y], deriv_y: &mut [f64; LEN_Y]);
+  fn rec(&self, t: &f64, y: &[f64; LEN_Y], delta_y: &mut [f64; LEN_Y], act: &[bool; LEN_B]);
+  fn cond(
+    &self,
+    dec_t: &Decimal,
+    act: &mut [bool; LEN_B],
+    next_t: &[Decimal; LEN_B],
+    y: &[f64; LEN_Y],
+  );
+  fn beats(&self, t: &f64, y: &[f64; LEN_Y]) -> [(Decimal, Decimal, Decimal, bool); LEN_B];
+  fn cre(&self, t: &f64, y: &mut [f64; LEN_Y]);
+
+  fn getp(&self) -> &[f64; LEN_P] {
+    unimplemented!(
+      "\nplease implement setp function in OptModelTrait:\n
+fn setp(&mut self, index: usize, value: f64) {{
+  self.p[index] = value;
+}}\n
+"
+    );
+  }
 }
 
-pub trait OptTraitOde<const LEN_Y: usize, const LEN_P: usize, const LEN_X: usize> {
-  fn getx(&self);
-}
-
-pub trait OptTraitFix<
+pub trait FixModelOptTrait<
   const LEN_Y: usize,
   const LEN_P: usize,
   const LEN_B: usize,
