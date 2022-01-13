@@ -12,7 +12,7 @@ pub trait FixModelSimTrait<const LEN_Y: usize, const LEN_P: usize, const LEN_B: 
     next_t: &[Decimal; LEN_B],
     y: &[f64; LEN_Y],
   );
-  fn beat(&self, t: &f64, y: &[f64; LEN_Y]) -> [[Decimal; 3]; LEN_B];
+  fn beats(&self, t: &f64, y: &[f64; LEN_Y]) -> [(Decimal, Decimal, Decimal, bool); LEN_B];
   fn cre(&self, t: &f64, y: &mut [f64; LEN_Y]);
 
   fn getp(&self) -> &[f64; LEN_P] {
