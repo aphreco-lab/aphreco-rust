@@ -1,3 +1,5 @@
+use super::result::SimResult;
+
 use rust_decimal::Decimal;
 
 pub trait SimModelTraitFix<const LEN_Y: usize, const LEN_P: usize, const LEN_B: usize> {
@@ -41,5 +43,18 @@ where
 {
   pub fn new(model: M) -> Self {
     Self { model }
+  }
+
+  pub fn run(&self, smp_t: &Vec<f64>) -> SimResult<LEN_Y> {
+    let (ini_t, ini_y) = self.model.init();
+    let beats = self.model.beats(&ini_t, &ini_y);
+    // let (end_t, mut vdq_smp_t, mut dec_times) = self.initialize_times(&ini_t, smp_t, &beats);
+
+    let mut res_y: Vec<[f64; LEN_Y]> = Vec::new();
+
+    let mut cur_t = ini_t;
+    let mut cur_y = ini_y;
+
+    SimResult::new(smp_t.clone(), res_y)
   }
 }
