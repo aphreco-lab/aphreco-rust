@@ -1,12 +1,14 @@
 mod beat;
 mod simulate;
+mod step;
 
 pub mod prelude {
-    // macro
-    pub use crate::beat;
-
     // model
-    pub use crate::simulate::FixSimModelTrait;
+    pub use crate::beat;
     pub use core::str::FromStr;
     pub use rust_decimal::Decimal;
+
+    // simulate
+    pub use crate::simulate::{SimModelTraitFix, SimulatorFix};
+    pub use crate::step::Stepper;
 }

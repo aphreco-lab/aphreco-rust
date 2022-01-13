@@ -1,7 +1,11 @@
 use aphrecors::prelude::*;
 
 fn main() {
-  let _model = Model::new();
+  let model = Model::new();
+  let simulator = SimulatorFix::new(model, Stepper::Rk4);
+  let sampling_time = sampling_time();
+  let simres = simulator.run(&sampling_time);
+  simres.save("./examples");
 }
 
 #[allow(dead_code)]
@@ -14,7 +18,7 @@ const LEN_P: usize = 11;
 const LEN_B: usize = 2;
 
 #[allow(dead_code)]
-impl FixSimModelTrait<LEN_Y, LEN_P, LEN_B> for Model {
+impl SimModelTraitFix<LEN_Y, LEN_P, LEN_B> for Model {
   fn new() -> Self {
     let p = [
       0.1,   // p[0] k12
