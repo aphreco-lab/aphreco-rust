@@ -7,7 +7,11 @@ fn main() {
 #[allow(dead_code)]
 pub struct Model {}
 
-impl SimModelTrait for Model {
+const LEN_Y: usize = 0;
+const LEN_P: usize = 0;
+const LEN_B: usize = 0;
+
+impl FixModelSimTrait<LEN_Y, LEN_P, LEN_B> for Model {
   fn new() -> Self {
     Self {}
   }
