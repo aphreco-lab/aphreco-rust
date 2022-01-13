@@ -7,4 +7,7 @@ pub mod prelude {
     pub use crate::model::{
         FixModelSimTrait, FlexModelSimTrait, OdeModelSimTrait, RecModelSimTrait,
     };
+
+    pub use core::str::FromStr;
+    pub use rust_decimal::Decimal;
 }
