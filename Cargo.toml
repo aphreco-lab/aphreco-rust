@@ -6,3 +6,5 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+rust_decimal = "1.19.0"
+num-traits = { default-features = false, features = ["i128"], version = "0.2" }
