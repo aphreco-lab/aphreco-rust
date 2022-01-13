@@ -2,7 +2,10 @@ use aphrecors::prelude::*;
 
 fn main() {
   let model = Model::new();
-  let _simulator = SimulatorFix::new(model, Stepper::Rk4);
+  let simulator = SimulatorFix::new(model, Stepper::Rk4);
+  let sampling_time = sampling_time();
+  let simres = simulator.run(&sampling_time);
+  simres.save("./examples");
 }
 
 #[allow(dead_code)]
