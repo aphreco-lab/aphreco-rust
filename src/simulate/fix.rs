@@ -1,6 +1,6 @@
 use rust_decimal::Decimal;
 
-pub trait FixSimModelTrait<const LEN_Y: usize, const LEN_P: usize, const LEN_B: usize> {
+pub trait SimModelTraitFix<const LEN_Y: usize, const LEN_P: usize, const LEN_B: usize> {
   fn new() -> Self;
   fn init(&self) -> (f64, [f64; LEN_Y]);
   fn ode(&self, t: &f64, y: &[f64; LEN_Y], deriv_y: &mut [f64; LEN_Y]);
@@ -23,5 +23,23 @@ fn setp(&mut self, index: usize, value: f64) {{
 }}\n
 "
     );
+  }
+}
+
+#[derive(Clone)]
+pub struct SimulatorFix<M, const LEN_Y: usize, const LEN_P: usize, const LEN_B: usize>
+where
+  M: SimModelTraitFix<LEN_Y, LEN_P, LEN_B>,
+{
+  pub model: M,
+}
+
+impl<M, const LEN_Y: usize, const LEN_P: usize, const LEN_B: usize>
+  SimulatorFix<M, LEN_Y, LEN_P, LEN_B>
+where
+  M: SimModelTraitFix<LEN_Y, LEN_P, LEN_B>,
+{
+  pub fn new(model: M) -> Self {
+    Self { model }
   }
 }

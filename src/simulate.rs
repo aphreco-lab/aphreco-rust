@@ -1,3 +1,3 @@
-mod model;
+mod fix;
 
-pub use super::simulate::model::FixSimModelTrait;
+pub use super::simulate::fix::{SimModelTraitFix, SimulatorFix};
