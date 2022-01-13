@@ -71,10 +71,10 @@ impl FixModelSimTrait<LEN_Y, LEN_P, LEN_B> for Model {
   }
 
   #[allow(unused_variables)]
-  fn beat(&self, t: &f64, y: &[f64; LEN_Y]) -> [[Decimal; 3]; LEN_B] {
+  fn beats(&self, t: &f64, y: &[f64; LEN_Y]) -> [(Decimal, Decimal, Decimal, bool); LEN_B] {
     [
-      beat![self.p[2], self.p[3], self.p[4]],
-      beat![self.p[5], self.p[6], self.p[7]],
+      beat!(self.p[2], self.p[3], self.p[4], false),
+      beat!(self.p[5], self.p[6], self.p[7], false),
     ]
   }
 
