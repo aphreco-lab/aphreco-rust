@@ -2,7 +2,7 @@ use aphrecors::prelude::*;
 
 fn main() {
   let model = Model::new();
-  let _simulator = SimulatorFix::new(model);
+  let _simulator = SimulatorFix::new(model, Stepper::Rk4);
 }
 
 #[allow(dead_code)]

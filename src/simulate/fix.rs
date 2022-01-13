@@ -1,4 +1,5 @@
 use super::result::SimResult;
+use crate::step::Stepper;
 
 use rust_decimal::Decimal;
 
@@ -41,7 +42,7 @@ impl<M, const LEN_Y: usize, const LEN_P: usize, const LEN_B: usize>
 where
   M: SimModelTraitFix<LEN_Y, LEN_P, LEN_B>,
 {
-  pub fn new(model: M) -> Self {
+  pub fn new(model: M, stepper: Stepper) -> Self {
     Self { model }
   }
 
