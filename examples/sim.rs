@@ -2,15 +2,10 @@ use aphreco::prelude::*;
 
 fn main() {
   let model = Model::new();
-  let simulator = SimulatorFix::new(model, Stepper::Dopri45);
+  let simulator = Simulator::new(model, Stepper::Dopri45);
   let sampling_time = sampling_time();
-  let simres = simulator.run(&sampling_time);
+  clock!(let simres = simulator.run(&sampling_time));
   simres.save("./examples");
-}
-
-#[allow(dead_code)]
-pub struct Model {
-  pub p: [f64; LEN_P],
 }
 
 const LEN_Y: usize = 4;
@@ -18,21 +13,27 @@ const LEN_P: usize = 11;
 const LEN_B: usize = 2;
 
 #[allow(dead_code)]
-impl SimModelTraitFix<LEN_Y, LEN_P, LEN_B> for Model {
+pub struct Model {
+  p: [f64; LEN_P],
+}
+
+#[allow(dead_code)]
+impl SimModelTrait<LEN_Y, LEN_P, LEN_B> for Model {
   fn new() -> Self {
     let p = [
-      0.2,   // p[0] k12
-      0.05,  // p[1] k21
-      0.0,   // p[2] ini_b1
-      1e12,  // p[3] end_b1
-      0.1,   // p[4] tau_b1
-      1.0,   // p[5] ini_b2
-      1e12,  // p[6] end_b2
-      0.2,   // p[7] tau_b2
-      2.0,   // p[8] R_cre
-      10.0,  // p[9] X_dose_A
-      500.0, // p[10] MW_A
+      0.2,      // p[0] k12
+      0.05,     // p[1] k21
+      0.0,      // p[2] ini_b1
+      100000.0, // p[3] end_b1
+      0.1,      // p[4] tau_b1
+      1.0,      // p[5] ini_b2
+      100000.0, // p[6] end_b2
+      0.2,      // p[7] tau_b2
+      2.0,      // p[8] R_cre
+      10.0,     // p[9] X_dose_A
+      500.0,    // p[10] MW_A
     ];
+
     Self { p }
   }
 
@@ -44,6 +45,8 @@ impl SimModelTraitFix<LEN_Y, LEN_P, LEN_B> for Model {
       10.0,  // y[2] C
       0.0,   // y[3] D
     ];
+    let _b0 = ();
+    let _a0 = ();
     (t0, y0)
   }
 
@@ -76,10 +79,10 @@ impl SimModelTraitFix<LEN_Y, LEN_P, LEN_B> for Model {
   }
 
   #[allow(unused_variables)]
-  fn beats(&self, t: &f64, y: &[f64; LEN_Y]) -> [[Decimal; 3]; LEN_B] {
+  fn beat(&self, t: &f64, y: &[f64; LEN_Y]) -> [[Decimal; 3]; LEN_B] {
     [
-      beat!(self.p[2], self.p[3], self.p[4]),
-      beat!(self.p[5], self.p[6], self.p[7]),
+      beat![self.p[2], self.p[3], self.p[4]],
+      beat![self.p[5], self.p[6], self.p[7]],
     ]
   }
 
@@ -87,13 +90,8 @@ impl SimModelTraitFix<LEN_Y, LEN_P, LEN_B> for Model {
   fn cre(&self, t: &f64, y: &mut [f64; LEN_Y]) {
     y[3] = self.p[8] * t;
   }
-
-  fn getp(&self) -> &[f64; LEN_P] {
-    &self.p
-  }
 }
 
-#[allow(dead_code)]
 fn sampling_time() -> Vec<f64> {
   let mut vec_smp_t = Vec::new();
   for i in 0..=5000 {
