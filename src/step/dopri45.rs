@@ -86,8 +86,8 @@ where
       y5: [0f64; LEN_Y],
       total_tols: [0f64; LEN_Y],
       abstol: 1e-6,
-      reltol: 1e-3,
-      hmin: 1e-6,
+      reltol: 1e-6,
+      hmin: 1e-7,
       hmax: 1e-2,
     }
   }
@@ -105,23 +105,12 @@ where
         // renew t and y
         next_t = t + self.h;
         *y = self.y5;
-
-        if rms_err < 1e-4 {
-          self.h *= 1.5;
-        }
-
+        // extend step size
+        self.update_stepsize(rms_err);
         break;
       } else {
-        let ratio = 0.9 * ((1.0 / rms_err).powf(1.0 / Self::ORDER));
-
-        if ratio < 0.125 {
-          self.h *= 0.125;
-        } else if ratio < 4.0 {
-          self.h *= ratio;
-        } else {
-          self.h *= 4.0;
-        }
-
+        // shrink step size
+        self.update_stepsize(rms_err);
         if self.h < self.hmin {
           self.h = self.hmin
         } else if self.hmax < self.h {
@@ -215,5 +204,16 @@ where
     let rms_err = (sum_of_squared_err / LEN_Y as f64).sqrt();
 
     rms_err
+  }
+
+  fn update_stepsize(&mut self, rms_err: f64) {
+    let ratio = 0.9 * ((1.0 / rms_err).powf(1.0 / Self::ORDER));
+    if ratio < 0.25 {
+      self.h *= 0.25;
+    } else if ratio < 4.0 {
+      self.h *= ratio;
+    } else {
+      self.h *= 4.0;
+    }
   }
 }

@@ -136,7 +136,7 @@ where
     res_y.push(cur_y);
 
     // ***time measurement***
-    if false {
+    if true {
       println!("Ini  : {:.10}", time_ini.as_secs_f32());
       println!("Rec  : {:.10}", time_rec.as_secs_f32());
       println!("Ode  : {:.10}", time_ode.as_secs_f32());
