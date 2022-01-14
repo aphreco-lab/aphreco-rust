@@ -13,7 +13,7 @@ fn main() {
 
   let optimizer = Optimizer::NelderMead;
   clock!(let optres = optimizer.run(&mut objective));
-  optres.save("./examples");
+  optres.save("./");
 }
 
 const LEN_Y: usize = 4;

@@ -5,7 +5,7 @@ fn main() {
   let simulator = Simulator::new(model, Stepper::Dopri45);
   let sampling_time = sampling_time();
   clock!(let simres = simulator.run(&sampling_time));
-  simres.save("./examples");
+  simres.save("./");
 }
 
 const LEN_Y: usize = 4;
