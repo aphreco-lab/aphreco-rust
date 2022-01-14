@@ -2,8 +2,12 @@
 name = "aphreco"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+authors = ["Satoshi Koyama"]
+repository = "https://github.com/aphreco-lab/aphreco-rust"
+keywords = ["simulation", "optimization"]
+license-file = "LICENSE"
+readme = "README.md"
+description = "A small-scale modeling library for pharmacokinetics"
 
 [dependencies]
 ndarray = "0.14.0"
