@@ -1,8 +1,8 @@
-use aphrecors::prelude::*;
+use aphreco::prelude::*;
 
 fn main() {
   let model = Model::new();
-  let simulator = SimulatorFix::new(model, Stepper::Rk4);
+  let simulator = SimulatorFix::new(model, Stepper::Dopri45);
   let sampling_time = sampling_time();
   let simres = simulator.run(&sampling_time);
   simres.save("./examples");
@@ -21,8 +21,8 @@ const LEN_B: usize = 2;
 impl SimModelTraitFix<LEN_Y, LEN_P, LEN_B> for Model {
   fn new() -> Self {
     let p = [
-      0.1,   // p[0] k12
-      0.1,   // p[1] k21
+      0.2,   // p[0] k12
+      0.05,  // p[1] k21
       0.0,   // p[2] ini_b1
       1e12,  // p[3] end_b1
       0.1,   // p[4] tau_b1
@@ -46,6 +46,7 @@ impl SimModelTraitFix<LEN_Y, LEN_P, LEN_B> for Model {
     ];
     (t0, y0)
   }
+
   #[allow(unused_variables)]
   fn ode(&self, t: &f64, y: &[f64; LEN_Y], deriv_y: &mut [f64; LEN_Y]) {
     deriv_y[0] = -self.p[0] * y[0] + self.p[1] * y[1];
