@@ -19,7 +19,7 @@ pub trait SimModelTraitFix<const LEN_Y: usize, const LEN_P: usize, const LEN_B: 
     next_t: &[Decimal; LEN_B],
     y: &[f64; LEN_Y],
   );
-  fn beats(&self, t: &f64, y: &[f64; LEN_Y]) -> [(Decimal, Decimal, Decimal, bool); LEN_B];
+  fn beats(&self, t: &f64, y: &[f64; LEN_Y]) -> [[Decimal; 3]; LEN_B];
   fn cre(&self, t: &f64, y: &mut [f64; LEN_Y]);
 
   fn getp(&self) -> &[f64; LEN_P] {
@@ -62,13 +62,9 @@ where
     let clock_start = Instant::now(); // ***time measurement***
 
     // initialize
-    // ini_t: initial time of simulation (t0)
-    // act: bool array indicating whether or not the recursive equations
-    //      for each beat should be calculated at the cur_t.
     let (ini_t, ini_y) = self.model.init();
-    let ini_beats = self.model.beats(&ini_t, &ini_y);
-    let (end_t, mut vdq_smp_t, mut dec_times, beats, mut act) =
-      self.initialize_times(&ini_t, smp_t, ini_beats);
+    let beats = self.model.beats(&ini_t, &ini_y);
+    let (end_t, mut vdq_smp_t, mut dec_times) = self.initialize_times(&ini_t, smp_t, &beats);
 
     // for storing results
     let mut res_y: Vec<[f64; LEN_Y]> = Vec::new();
@@ -84,6 +80,10 @@ where
     // difference of y for REC
     let mut deriv_y = [0f64; LEN_Y];
     let mut delta_y = [0f64; LEN_Y];
+
+    // bool array indicating whether or not the recursive equations
+    // for each beat should be calculated at the cur_t.
+    let mut act = [false; LEN_B];
 
     // next_t indicates the next earliest discrete time point
     // for determining the end time of ODE solving in each loop.
@@ -151,13 +151,11 @@ where
     &self,
     ini_t: &f64,
     smp_t: &Vec<f64>,
-    ini_beats: [(Decimal, Decimal, Decimal, bool); LEN_B],
+    beats: &[[Decimal; 3]; LEN_B],
   ) -> (
     f64,
     VecDeque<f64>,
     (Decimal, Decimal, Decimal, [Decimal; LEN_B]),
-    [[Decimal; 3]; LEN_B],
-    [bool; LEN_B],
   ) {
     let mut vec_smp_t = smp_t.clone();
     // sort
@@ -182,32 +180,17 @@ where
     let dec_stopped = dec_end_t + Decimal::from_str("1").unwrap();
 
     // set the first discrete time point for each beat.
-    // and create act (is_active) at t=0.
     let mut dec_first_t = [dec_ini_t; LEN_B];
-    let mut ini_act = [false; LEN_B];
-    let mut beats = [[Decimal::from_str("0.0").unwrap(); 3]; LEN_B];
-
     for i in 0..LEN_B {
-      // t0 of simulatjion < beat starting time
-      if dec_ini_t < ini_beats[i].0 {
-        dec_first_t[i] = ini_beats[i].0;
+      if dec_ini_t < beats[i][0] {
+        dec_first_t[i] = beats[i][0];
       }
-
-      // is_active at t=0 is true
-      ini_act[i] = ini_beats[i].3;
-
-      // beats
-      beats[i][0] = ini_beats[i].0;
-      beats[i][1] = ini_beats[i].1;
-      beats[i][2] = ini_beats[i].2;
     }
 
     (
       end_t,
       vdq_smp_t,
       (dec_ini_t, dec_end_t, dec_stopped, dec_first_t),
-      beats,
-      ini_act,
     )
   }
 
