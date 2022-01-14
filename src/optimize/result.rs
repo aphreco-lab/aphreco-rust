@@ -12,8 +12,12 @@ pub struct OptResult {
 }
 
 impl OptResult {
-  pub fn new(x: Array1<f64>, index: Vec<usize>, f: f64) -> Self {
-    Self { x, index, f }
+  pub fn new(opt_x: Array1<f64>, index: Vec<usize>, opt_f: f64) -> Self {
+    Self {
+      opt_x,
+      index,
+      opt_f,
+    }
   }
 
   pub fn save(&self, dir: &str) {
