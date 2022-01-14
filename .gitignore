@@ -3,3 +3,4 @@ Cargo.lock
 
 # result files in examples
 examples/Sim*
+examples/Opt*
