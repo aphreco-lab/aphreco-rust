@@ -1,5 +1,7 @@
 use super::result::SimResult;
-use crate::step::{ConcreteStepper, Stepper};
+
+use crate::model::SimModelTrait;
+use crate::stepper::{ConcreteStepper, Stepper};
 
 use core::str::FromStr;
 use num_traits::ToPrimitive;
@@ -7,45 +9,19 @@ use rust_decimal::Decimal;
 use std::collections::VecDeque;
 use std::time::{Duration, Instant};
 
-pub trait SimModelTraitFix<const LEN_Y: usize, const LEN_P: usize, const LEN_B: usize> {
-  fn new() -> Self;
-  fn init(&self) -> (f64, [f64; LEN_Y]);
-  fn ode(&self, t: &f64, y: &[f64; LEN_Y], deriv_y: &mut [f64; LEN_Y]);
-  fn rec(&self, t: &f64, y: &[f64; LEN_Y], delta_y: &mut [f64; LEN_Y], act: &[bool; LEN_B]);
-  fn cond(
-    &self,
-    dec_t: &Decimal,
-    act: &mut [bool; LEN_B],
-    next_t: &[Decimal; LEN_B],
-    y: &[f64; LEN_Y],
-  );
-  fn beats(&self, t: &f64, y: &[f64; LEN_Y]) -> [[Decimal; 3]; LEN_B];
-  fn cre(&self, t: &f64, y: &mut [f64; LEN_Y]);
-
-  fn getp(&self) -> &[f64; LEN_P] {
-    unimplemented!(
-      "\nplease implement setp function in OptModelTrait:\n
-fn setp(&mut self, index: usize, value: f64) {{
-  self.p[index] = value;
-}}\n
-"
-    );
-  }
-}
-
 #[derive(Clone)]
-pub struct SimulatorFix<M, const LEN_Y: usize, const LEN_P: usize, const LEN_B: usize>
+pub struct Simulator<M, const LEN_Y: usize, const LEN_P: usize, const LEN_B: usize>
 where
-  M: SimModelTraitFix<LEN_Y, LEN_P, LEN_B>,
+  M: SimModelTrait<LEN_Y, LEN_P, LEN_B>,
 {
   pub model: M,
   pub stepper: Stepper,
 }
 
 impl<M, const LEN_Y: usize, const LEN_P: usize, const LEN_B: usize>
-  SimulatorFix<M, LEN_Y, LEN_P, LEN_B>
+  Simulator<M, LEN_Y, LEN_P, LEN_B>
 where
-  M: SimModelTraitFix<LEN_Y, LEN_P, LEN_B>,
+  M: SimModelTrait<LEN_Y, LEN_P, LEN_B>,
 {
   pub fn new(model: M, stepper: Stepper) -> Self {
     Self { model, stepper }
@@ -59,11 +35,10 @@ where
     let mut time_step = Duration::new(0, 0);
     let mut time_push = Duration::new(0, 0);
 
-    let clock_start = Instant::now(); // ***time measurement***
-
     // initialize
+    let clock_start = Instant::now(); // ***time measurement***
     let (ini_t, ini_y) = self.model.init();
-    let beats = self.model.beats(&ini_t, &ini_y);
+    let beats = self.model.beat(&ini_t, &ini_y);
     let (end_t, mut vdq_smp_t, mut dec_times) = self.initialize_times(&ini_t, smp_t, &beats);
 
     // for storing results

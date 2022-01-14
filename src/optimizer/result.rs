@@ -6,9 +6,9 @@ use std::path::Path;
 use ndarray::Array1;
 
 pub struct OptResult {
-  pub opt_x: Array1<f64>,
+  pub x: Array1<f64>,
   pub index: Vec<usize>,
-  pub opt_f: f64,
+  pub f: f64,
 }
 
 impl OptResult {
@@ -20,7 +20,7 @@ impl OptResult {
     let save_dir = Path::new(dir);
     let mut str_result = String::new();
 
-    for (index, value) in self.index.iter().zip(self.opt_x.iter()) {
+    for (index, value) in self.index.iter().zip(self.x.iter()) {
       str_result.push_str(&index.to_string());
       str_result.push(',');
       str_result.push_str(&value.to_string());
