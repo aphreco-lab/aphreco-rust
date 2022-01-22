@@ -25,5 +25,6 @@ pub mod prelude {
   // optimization
   pub use crate::data::Data;
   pub use crate::objective::Objective;
+  pub use crate::optimizer::OptOptions;
   pub use crate::optimizer::Optimizer;
 }

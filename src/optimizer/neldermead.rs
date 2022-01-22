@@ -1,4 +1,4 @@
-use super::base::ConcreteOptimizer;
+use super::base::{ConcreteOptimizer, OptOptions};
 use super::result::OptResult;
 
 use crate::model::OptModelTrait;
@@ -23,9 +23,18 @@ pub struct NelderMead {
 }
 
 impl ConcreteOptimizer for NelderMead {
-  fn new(len_x: usize) -> Self {
-    let adaptive = true;
-    let max_iter = 0;
+  fn new(len_x: usize, options: &OptOptions) -> Self {
+    let (adaptive, max_iter, verbose) = match options {
+      OptOptions::Default => (true, 0, true),
+
+      OptOptions::NelderMead {
+        adaptive,
+        max_iter,
+        verbose,
+      } => (*adaptive, *max_iter, *verbose),
+
+      _ => panic!("Invalid OptOptions variant."),
+    };
 
     let rho;
     let chi;
@@ -46,7 +55,6 @@ impl ConcreteOptimizer for NelderMead {
 
     let nonzero_delta = 0.05;
     let zero_delta = 0.00025;
-    let verbose = true;
 
     Self {
       max_iter,

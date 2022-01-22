@@ -7,12 +7,25 @@ fn main() {
   let data = Data::new(obs());
   let mut objective = Objective::new(simulator, data);
 
-  let optimizer = Optimizer::GeneticAlgorithm;
-  clock!(let optres = optimizer.run(&mut objective));
+  let ga_options = OptOptions::GeneticAlgorithm {
+    max_gen: 100,
+    n_pop: 100,
+    mutation_rate: 0.5,
+    verbose: false,
+  };
+  let optimizer = Optimizer::GeneticAlgorithm(ga_options);
+  let optres = optimizer.run(&mut objective);
+
   objective.setx(&optres.x);
 
-  let optimizer = Optimizer::NelderMead;
-  clock!(let optres = optimizer.run(&mut objective));
+  let nm_options = OptOptions::NelderMead {
+    max_iter: 0,
+    adaptive: true,
+    verbose: true,
+  };
+  let optimizer = Optimizer::NelderMead(nm_options);
+  let optres = optimizer.run(&mut objective);
+
   optres.save("./");
 }
 
