@@ -2,13 +2,21 @@ use aphreco::prelude::*;
 
 fn main() {
   let model = Model::new();
-  let simulator = Simulator::new(model, Stepper::Dopri45);
+  let st_options = StepOptions::Dopri45 {
+    h0: 1e-4,
+    abstol: 1e-6,
+    reltol: 1e-9,
+    hmin: 1e-6,
+    hmax: 1e-2,
+  };
+  let stepper = Stepper::Dopri45(st_options);
+  let simulator = Simulator::new(model, stepper);
 
   let data = Data::new(obs());
   let mut objective = Objective::new(simulator, data);
 
   let ga_options = OptOptions::GeneticAlgorithm {
-    max_gen: 100,
+    max_gen: 30,
     n_pop: 100,
     mutation_rate: 0.5,
     verbose: false,

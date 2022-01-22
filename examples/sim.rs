@@ -2,7 +2,17 @@ use aphreco::prelude::*;
 
 fn main() {
   let model = Model::new();
-  let simulator = Simulator::new(model, Stepper::Dopri45);
+  // let stepper = Stepper::Rk4(StepOptions::Default);
+  let st_options = StepOptions::Dopri45 {
+    h0: 1e-3,
+    abstol: 1e-6,
+    reltol: 1e-6,
+    hmin: 1e-6,
+    hmax: 1e-3,
+  };
+  let stepper = Stepper::Dopri45(st_options);
+  let simulator = Simulator::new(model, stepper);
+
   let sampling_time = sampling_time();
   clock!(let simres = simulator.run(&sampling_time));
   simres.save("./");

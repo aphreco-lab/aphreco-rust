@@ -1,3 +1,5 @@
+use super::base::StepOptions;
+
 pub struct Dopri45<Ode, const LEN_Y: usize>
 where
   Ode: Fn(&f64, &[f64; LEN_Y], &mut [f64; LEN_Y]),
@@ -70,10 +72,30 @@ where
   const B55: f64 = Self::A75;
   const B56: f64 = Self::A76;
 
-  pub fn new(ode: Ode) -> Self {
+  pub fn new(ode: Ode, options: &StepOptions) -> Self {
+    let (h0, abstol, reltol, hmin, hmax) = match options {
+      StepOptions::Default => (
+        1e-4, // default h0
+        1e-6, // default abstol
+        1e-6, // default reltol
+        1e-6, // default hmin
+        1e-2, // default hmax
+      ),
+
+      StepOptions::Dopri45 {
+        h0,
+        abstol,
+        reltol,
+        hmin,
+        hmax,
+      } => (*h0, *abstol, *reltol, *hmin, *hmax),
+
+      _ => panic!("Invalid StepOptions variant."),
+    };
+
     Self {
       ode: ode,
-      h: 1e-4,
+      h: h0,
       k1: [0f64; LEN_Y],
       k2: [0f64; LEN_Y],
       k3: [0f64; LEN_Y],
@@ -85,10 +107,10 @@ where
       y4: [0f64; LEN_Y],
       y5: [0f64; LEN_Y],
       total_tols: [0f64; LEN_Y],
-      abstol: 1e-6,
-      reltol: 1e-6,
-      hmin: 1e-6,
-      hmax: 1e-2,
+      abstol: abstol,
+      reltol: reltol,
+      hmin: hmin,
+      hmax: hmax,
     }
   }
 
