@@ -1,10 +1,10 @@
 use aphreco::prelude::*;
 
 fn main() {
-  let model = OptModel::new();
+  let model = Model::new();
   let simulator = Simulator::new(model, Stepper::Dopri45);
 
-  let data = Data::new(observation());
+  let data = Data::new(obs());
   let mut objective = Objective::new(simulator, data);
 
   let optimizer = Optimizer::GeneticAlgorithm;
@@ -22,12 +22,12 @@ const LEN_B: usize = 2;
 
 #[allow(dead_code)]
 #[derive(Clone)]
-pub struct OptModel {
+pub struct Model {
   pub p: [f64; LEN_P],
 }
 
 #[allow(dead_code)]
-impl SimModelTrait<LEN_Y, LEN_P, LEN_B> for OptModel {
+impl SimModelTrait<LEN_Y, LEN_P, LEN_B> for Model {
   fn new() -> Self {
     let p = [
       0.1,   // p[0] k12
@@ -110,7 +110,7 @@ fn sampling_time() -> Vec<f64> {
 
 const LEN_X: usize = 2;
 
-impl OptModelTrait<LEN_Y, LEN_P, LEN_B, LEN_X> for OptModel {
+impl OptModelTrait<LEN_Y, LEN_P, LEN_B, LEN_X> for Model {
   fn getx(&self) -> (Vec<usize>, Option<Vec<(f64, f64)>>) {
     let x_index = vec![0, 1];
     let x_bounds = Some(vec![(1e-4, 1e0), (1e-4, 1e0)]);
@@ -128,7 +128,7 @@ impl OptModelTrait<LEN_Y, LEN_P, LEN_B, LEN_X> for OptModel {
 }
 
 #[allow(dead_code)]
-fn observation() -> Vec<(usize, f64, f64, Option<f64>, Option<f64>)> {
+fn obs() -> Vec<(usize, f64, f64, Option<f64>, Option<f64>)> {
   vec![
     // A <=> B
     // ddt_A = -k12*A + k21*B
