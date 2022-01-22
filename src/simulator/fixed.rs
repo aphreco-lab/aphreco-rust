@@ -269,13 +269,6 @@ where
       // store results
       let clock_start = Instant::now(); // ***time measurement***
       loop {
-        if cur_t < 1e-10 && cur_t != 0.0 {
-          println!("cur_t; {}", &cur_t);
-          println!("cur_y; {:?}", cur_y);
-          // println!("{}", self.stepper.h);
-          panic!();
-        }
-
         if vdq_smp_t.len() == 0 {
           println!("All sample points have been collected.");
           break;
@@ -295,9 +288,6 @@ where
 
           // store results
           res_y.push(out_y);
-
-          // print for debug.
-          // self._print_current_state(&out_t, &out_y);
         } else {
           break;
         }

@@ -1,4 +1,4 @@
-use super::base::ConcreteOptimizer;
+use super::base::{ConcreteOptimizer, OptOptions};
 use super::result::OptResult;
 
 use crate::model::OptModelTrait;
@@ -24,12 +24,21 @@ pub struct GeneticAlgorithm {
 }
 
 impl ConcreteOptimizer for GeneticAlgorithm {
-  fn new(len_x: usize) -> Self {
-    let max_gen = 100;
-    let n_pop = 100;
+  fn new(len_x: usize, options: &OptOptions) -> Self {
+    let (max_gen, n_pop, mutation_rate, verbose) = match options {
+      OptOptions::Default => (100, 10, 0.8, false),
+
+      OptOptions::GeneticAlgorithm {
+        max_gen,
+        n_pop,
+        mutation_rate,
+        verbose,
+      } => (*max_gen, *n_pop, *mutation_rate, *verbose),
+
+      _ => panic!("Invalid OptOptions variant."),
+    };
+
     let n_elite = if n_pop / 10 == 0 { 1 } else { n_pop / 10 };
-    let mutation_rate = 0.8;
-    let verbose = true;
 
     Self {
       max_gen,

@@ -20,10 +20,10 @@ pub mod prelude {
   // simulation
   pub use crate::simulator::SimResult;
   pub use crate::simulator::Simulator;
-  pub use crate::stepper::Stepper;
+  pub use crate::stepper::{StepOptions, Stepper};
 
   // optimization
   pub use crate::data::Data;
   pub use crate::objective::Objective;
-  pub use crate::optimizer::Optimizer;
+  pub use crate::optimizer::{OptOptions, Optimizer};
 }

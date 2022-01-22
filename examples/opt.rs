@@ -2,17 +2,40 @@ use aphreco::prelude::*;
 
 fn main() {
   let model = Model::new();
-  let simulator = Simulator::new(model, Stepper::Dopri45);
+  let st_options = StepOptions::Dopri45 {
+    h0: 1e-4,
+    abstol: 1e-6,
+    reltol: 1e-6,
+    hmin: 1e-6,
+    hmax: 1e-2,
+  };
+  let stepper = Stepper::Dopri45(st_options);
+  let simulator = Simulator::new(model, stepper);
 
   let data = Data::new(obs());
   let mut objective = Objective::new(simulator, data);
 
-  let optimizer = Optimizer::GeneticAlgorithm;
-  clock!(let optres = optimizer.run(&mut objective));
+  let ga_options = OptOptions::GeneticAlgorithm {
+    max_gen: 10,
+    n_pop: 50,
+    mutation_rate: 0.5,
+    verbose: true,
+  };
+  let optimizer = Optimizer::GeneticAlgorithm(ga_options);
+  let optres = optimizer.run(&mut objective);
+
   objective.setx(&optres.x);
 
-  let optimizer = Optimizer::NelderMead;
-  clock!(let optres = optimizer.run(&mut objective));
+  let nm_options = OptOptions::NelderMead {
+    max_iter: 0,
+    adaptive: true,
+    x_abstol: 1e-6,
+    f_abstol: 1e-6,
+    verbose: true,
+  };
+  let optimizer = Optimizer::NelderMead(nm_options);
+  let optres = optimizer.run(&mut objective);
+
   optres.save("./");
 }
 

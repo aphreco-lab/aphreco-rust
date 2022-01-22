@@ -2,9 +2,26 @@ use super::dopri45::Dopri45;
 use super::rk4::Rk4;
 
 #[derive(Clone)]
+pub enum StepOptions {
+  Default,
+
+  Rk4 {
+    h: f64,
+  },
+
+  Dopri45 {
+    h0: f64,
+    abstol: f64,
+    reltol: f64,
+    hmin: f64,
+    hmax: f64,
+  },
+}
+
+#[derive(Clone)]
 pub enum Stepper {
-  Rk4,
-  Dopri45,
+  Rk4(StepOptions),
+  Dopri45(StepOptions),
 }
 
 impl Stepper {
@@ -13,12 +30,12 @@ impl Stepper {
     Ode: Fn(&f64, &[f64; LEN_Y], &mut [f64; LEN_Y]),
   {
     match self {
-      Stepper::Rk4 => ConcreteStepper::Rk4 {
-        concrete_stepper: Rk4::new(ode),
+      Stepper::Rk4(options) => ConcreteStepper::Rk4 {
+        concrete_stepper: Rk4::new(ode, options),
       },
 
-      Stepper::Dopri45 => ConcreteStepper::Dopri45 {
-        concrete_stepper: Dopri45::new(ode),
+      Stepper::Dopri45(options) => ConcreteStepper::Dopri45 {
+        concrete_stepper: Dopri45::new(ode, options),
       },
     }
   }

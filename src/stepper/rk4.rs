@@ -1,3 +1,5 @@
+use super::base::StepOptions;
+
 pub struct Rk4<Ode, const LEN_Y: usize>
 where
   Ode: Fn(&f64, &[f64; LEN_Y], &mut [f64; LEN_Y]),
@@ -15,10 +17,16 @@ impl<Ode, const LEN_Y: usize> Rk4<Ode, LEN_Y>
 where
   Ode: Fn(&f64, &[f64; LEN_Y], &mut [f64; LEN_Y]),
 {
-  pub fn new(ode: Ode) -> Self {
+  pub fn new(ode: Ode, options: &StepOptions) -> Self {
+    let h = match options {
+      StepOptions::Default => 1e-3,
+      StepOptions::Rk4 { h } => *h,
+      _ => panic!("Invalid StepOptions variant."),
+    };
+
     Self {
       ode: ode,
-      h: 1e-3,
+      h: h,
       k1: [0f64; LEN_Y],
       k2: [0f64; LEN_Y],
       k3: [0f64; LEN_Y],

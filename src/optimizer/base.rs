@@ -4,9 +4,28 @@ use crate::model::OptModelTrait;
 use crate::objective::Objective;
 use crate::optimizer::OptResult;
 
+pub enum OptOptions {
+  Default,
+
+  NelderMead {
+    max_iter: u64,
+    adaptive: bool,
+    x_abstol: f64,
+    f_abstol: f64,
+    verbose: bool,
+  },
+
+  GeneticAlgorithm {
+    max_gen: u64,
+    n_pop: usize,
+    mutation_rate: f64,
+    verbose: bool,
+  },
+}
+
 pub enum Optimizer {
-  NelderMead,
-  GeneticAlgorithm,
+  NelderMead(OptOptions),
+  GeneticAlgorithm(OptOptions),
 }
 
 impl Optimizer {
@@ -18,21 +37,21 @@ impl Optimizer {
     M: OptModelTrait<LEN_Y, LEN_P, LEN_B, LEN_X>,
   {
     match self {
-      Optimizer::NelderMead => {
-        let nm = NelderMead::new(objective.len_x);
-        nm.run(objective)
+      Optimizer::NelderMead(options) => {
+        let opt = NelderMead::new(objective.len_x, options);
+        opt.run(objective)
       }
 
-      Optimizer::GeneticAlgorithm => {
-        let nm = GeneticAlgorithm::new(objective.len_x);
-        nm.run(objective)
+      Optimizer::GeneticAlgorithm(options) => {
+        let opt = GeneticAlgorithm::new(objective.len_x, options);
+        opt.run(objective)
       }
     }
   }
 }
 
 pub trait ConcreteOptimizer {
-  fn new(len_x: usize) -> Self;
+  fn new(len_x: usize, options: &OptOptions) -> Self;
 
   fn run<M, const LEN_Y: usize, const LEN_P: usize, const LEN_B: usize, const LEN_X: usize>(
     &self,
