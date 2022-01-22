@@ -1,13 +1,13 @@
 [package]
 name = "aphreco"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Satoshi Koyama"]
 repository = "https://github.com/aphreco-lab/aphreco-rust"
 keywords = ["simulation", "optimization"]
 license-file = "LICENSE"
 readme = "README.md"
-description = "A small-scale modeling library for pharmacokinetics"
+description = "A small-scale physiological modeling library"
 
 [dependencies]
 ndarray = "0.14.0"
