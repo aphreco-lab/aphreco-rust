@@ -19,19 +19,29 @@ pub struct NelderMead {
   nonzero_delta: f64,
   zero_delta: f64,
   len_x: usize,
+  x_abstol: f64,
+  f_abstol: f64,
   verbose: bool,
 }
 
 impl ConcreteOptimizer for NelderMead {
   fn new(len_x: usize, options: &OptOptions) -> Self {
-    let (adaptive, max_iter, verbose) = match options {
-      OptOptions::Default => (true, 0, true),
+    let (max_iter, adaptive, x_abstol, f_abstol, verbose) = match options {
+      OptOptions::Default => (
+        0,    // max_iter
+        true, // adaptive
+        1e-4, // x_abstol
+        1e-4, // f_abstol
+        true, // verbose
+      ),
 
       OptOptions::NelderMead {
-        adaptive,
         max_iter,
+        adaptive,
+        x_abstol,
+        f_abstol,
         verbose,
-      } => (*adaptive, *max_iter, *verbose),
+      } => (*max_iter, *adaptive, *x_abstol, *f_abstol, *verbose),
 
       _ => panic!("Invalid OptOptions variant."),
     };
@@ -65,6 +75,8 @@ impl ConcreteOptimizer for NelderMead {
       nonzero_delta,
       zero_delta,
       len_x,
+      x_abstol,
+      f_abstol,
       verbose,
     }
   }
@@ -111,9 +123,6 @@ impl ConcreteOptimizer for NelderMead {
       self.max_iter
     };
 
-    let f_abstol: f64 = 1e-4;
-    let x_abstol: f64 = 1e-4;
-
     // optimization
     for _ in 0..max_iter {
       // sort simplex in ascending order
@@ -127,7 +136,7 @@ impl ConcreteOptimizer for NelderMead {
       let f_best = simplex[0].0;
 
       // judge convergence
-      if self.is_converged(&simplex, x_abstol, f_abstol) {
+      if self.is_converged(&simplex) {
         println!("Converged. fcall={}", fcall);
         break;
       }
@@ -304,7 +313,7 @@ impl NelderMead {
     }
   }
 
-  fn is_converged(&self, simplex: &Simplex, x_abstol: f64, f_abstol: f64) -> bool {
+  fn is_converged(&self, simplex: &Simplex) -> bool {
     let mut max_f_dif = 0.0;
     let mut max_x_dif = 0.0;
 
@@ -327,7 +336,7 @@ impl NelderMead {
     }
 
     // converged or not
-    if max_x_dif <= x_abstol && max_f_dif <= f_abstol {
+    if max_x_dif <= self.x_abstol && max_f_dif <= self.f_abstol {
       true
     } else {
       false

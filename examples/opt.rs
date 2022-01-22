@@ -5,7 +5,7 @@ fn main() {
   let st_options = StepOptions::Dopri45 {
     h0: 1e-4,
     abstol: 1e-6,
-    reltol: 1e-9,
+    reltol: 1e-6,
     hmin: 1e-6,
     hmax: 1e-2,
   };
@@ -16,10 +16,10 @@ fn main() {
   let mut objective = Objective::new(simulator, data);
 
   let ga_options = OptOptions::GeneticAlgorithm {
-    max_gen: 30,
-    n_pop: 100,
+    max_gen: 10,
+    n_pop: 50,
     mutation_rate: 0.5,
-    verbose: false,
+    verbose: true,
   };
   let optimizer = Optimizer::GeneticAlgorithm(ga_options);
   let optres = optimizer.run(&mut objective);
@@ -29,6 +29,8 @@ fn main() {
   let nm_options = OptOptions::NelderMead {
     max_iter: 0,
     adaptive: true,
+    x_abstol: 1e-6,
+    f_abstol: 1e-6,
     verbose: true,
   };
   let optimizer = Optimizer::NelderMead(nm_options);

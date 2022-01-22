@@ -10,6 +10,8 @@ pub enum OptOptions {
   NelderMead {
     max_iter: u64,
     adaptive: bool,
+    x_abstol: f64,
+    f_abstol: f64,
     verbose: bool,
   },
 
