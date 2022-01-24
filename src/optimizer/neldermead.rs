@@ -28,11 +28,11 @@ impl ConcreteOptimizer for NelderMead {
   fn new(len_x: usize, options: &OptOptions) -> Self {
     let (max_iter, adaptive, x_abstol, f_abstol, verbose) = match options {
       OptOptions::Default => (
-        0,    // max_iter
-        true, // adaptive
-        1e-4, // x_abstol
-        1e-4, // f_abstol
-        true, // verbose
+        0,     // max_iter
+        true,  // adaptive
+        1e-4,  // x_abstol
+        1e-4,  // f_abstol
+        false, // verbose
       ),
 
       OptOptions::NelderMead {
@@ -65,6 +65,13 @@ impl ConcreteOptimizer for NelderMead {
 
     let nonzero_delta = 0.05;
     let zero_delta = 0.00025;
+
+    // set max_iter
+    let max_iter = if max_iter == 0 {
+      (len_x * 200) as u64
+    } else {
+      max_iter
+    };
 
     Self {
       max_iter,
@@ -116,15 +123,8 @@ impl ConcreteOptimizer for NelderMead {
       );
     }
 
-    // set max_iter
-    let max_iter = if self.max_iter == 0 {
-      (objective.len_x * 200) as u64
-    } else {
-      self.max_iter
-    };
-
     // optimization
-    for _ in 0..max_iter {
+    for _ in 0..self.max_iter {
       // sort simplex in ascending order
       simplex.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
       if self.verbose {
