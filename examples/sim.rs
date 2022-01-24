@@ -3,14 +3,15 @@ use aphreco::prelude::*;
 fn main() {
   let model = Model::new();
   // let stepper = Stepper::Rk4(StepOptions::Default);
-  let st_options = StepOptions::Dopri45 {
+  let step_options = StepOptions::Dopri45 {
     h0: 1e-3,
     abstol: 1e-6,
     reltol: 1e-6,
     hmin: 1e-6,
     hmax: 1e-3,
   };
-  let stepper = Stepper::Dopri45(st_options);
+  let stepper = Stepper::Dopri45(step_options);
+
   let simulator = Simulator::new(model, stepper);
 
   let sampling_time = sampling_time();
@@ -50,7 +51,7 @@ impl SimModelTrait<LEN_Y, LEN_P, LEN_B> for Model {
   fn init(&self) -> (f64, [f64; LEN_Y]) {
     let t0 = 0.0;
     let y0 = [
-      100.0, // y[p] A
+      100.0, // y[0] A
       0.0,   // y[1] B
       10.0,  // y[2] C
       0.0,   // y[3] D
