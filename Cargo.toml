@@ -1,6 +1,6 @@
 [package]
 name = "aphreco"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2021"
 authors = ["Satoshi Koyama"]
 repository = "https://github.com/aphreco-lab/aphreco-rust"
