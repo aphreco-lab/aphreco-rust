@@ -75,10 +75,10 @@ where
   pub fn new(ode: Ode, options: &StepOptions) -> Self {
     let (h0, abstol, reltol, hmin, hmax) = match options {
       StepOptions::Default => (
-        1e-4, // default h0
-        1e-6, // default abstol
-        1e-6, // default reltol
-        1e-6, // default hmin
+        1e-8, // default h0
+        1e-4, // default abstol
+        1e-4, // default reltol
+        1e-8, // default hmin
         1e-2, // default hmax
       ),
 
@@ -125,7 +125,7 @@ where
       // else, calculate step again after shortening step size.
       if rms_err <= 1.0 {
         // renew t and y
-        next_t = t + self.h;
+        next_t = t + self.h.clone();
         *y = self.y5;
         // extend step size
         self.update_stepsize(rms_err);
@@ -133,11 +133,6 @@ where
       } else {
         // shrink step size
         self.update_stepsize(rms_err);
-        if self.h < self.hmin {
-          self.h = self.hmin
-        } else if self.hmax < self.h {
-          self.h = self.hmax
-        }
       }
     }
 
@@ -145,69 +140,90 @@ where
   }
 
   pub fn step(&mut self, t: &f64, y: &mut [f64; LEN_Y], dy: &mut [f64; LEN_Y]) -> f64 {
-    (self.ode)(&t, &y, &mut self.k1);
+    (self.ode)(t, y, &mut self.k1);
 
+    let ha21 = self.h * Self::A21;
     for i in 0..LEN_Y {
-      self.wk[i] = y[i] + self.h * (Self::A21 * self.k1[i]);
+      self.wk[i] = y[i] + ha21 * self.k1[i];
     }
     (self.ode)(&(t + self.h * Self::C2), &self.wk, &mut self.k2);
 
+    let ha31 = self.h * Self::A31;
+    let ha32 = self.h * Self::A32;
     for i in 0..LEN_Y {
-      self.wk[i] = y[i] + self.h * (Self::A31 * self.k1[i] + Self::A32 * self.k2[i]);
+      self.wk[i] = y[i] + ha31 * self.k1[i] + ha32 * self.k2[i];
     }
     (self.ode)(&(t + self.h * Self::C3), &self.wk, &mut self.k3);
 
+    let ha41 = self.h * Self::A41;
+    let ha42 = self.h * Self::A42;
+    let ha43 = self.h * Self::A43;
     for i in 0..LEN_Y {
-      self.wk[i] =
-        y[i] + self.h * (Self::A41 * self.k1[i] + Self::A42 * self.k2[i] + Self::A43 * self.k3[i]);
+      self.wk[i] = y[i] + ha41 * self.k1[i] + ha42 * self.k2[i] + ha43 * self.k3[i];
     }
     (self.ode)(&(t + self.h * Self::C4), &self.wk, &mut self.k4);
 
+    let ha51 = self.h * Self::A51;
+    let ha52 = self.h * Self::A52;
+    let ha53 = self.h * Self::A53;
+    let ha54 = self.h * Self::A54;
     for i in 0..LEN_Y {
-      self.wk[i] = y[i]
-        + self.h
-          * (Self::A51 * self.k1[i]
-            + Self::A52 * self.k2[i]
-            + Self::A53 * self.k3[i]
-            + Self::A54 * self.k4[i]);
+      self.wk[i] =
+        y[i] + ha51 * self.k1[i] + ha52 * self.k2[i] + ha53 * self.k3[i] + ha54 * self.k4[i];
     }
     (self.ode)(&(t + self.h * Self::C5), &self.wk, &mut self.k5);
 
+    let ha61 = self.h * Self::A61;
+    let ha62 = self.h * Self::A62;
+    let ha63 = self.h * Self::A63;
+    let ha64 = self.h * Self::A64;
+    let ha65 = self.h * Self::A65;
     for i in 0..LEN_Y {
       self.wk[i] = y[i]
-        + self.h
-          * (Self::A61 * self.k1[i]
-            + Self::A62 * self.k2[i]
-            + Self::A63 * self.k3[i]
-            + Self::A64 * self.k4[i]
-            + Self::A65 * self.k5[i]);
+        + ha61 * self.k1[i]
+        + ha62 * self.k2[i]
+        + ha63 * self.k3[i]
+        + ha64 * self.k4[i]
+        + ha65 * self.k5[i];
     }
     (self.ode)(&(t + self.h * Self::C6), &self.wk, &mut self.k6);
 
+    let ha71 = self.h * Self::A71;
+    let ha72 = self.h * Self::A72;
+    let ha73 = self.h * Self::A73;
+    let ha74 = self.h * Self::A74;
+    let ha75 = self.h * Self::A75;
+    let ha76 = self.h * Self::A76;
     for i in 0..LEN_Y {
       self.wk[i] = y[i]
-        + self.h
-          * (Self::A71 * self.k1[i]
-            + Self::A72 * self.k2[i]
-            + Self::A73 * self.k3[i]
-            + Self::A74 * self.k4[i]
-            + Self::A75 * self.k5[i]
-            + Self::A76 * self.k6[i]);
+        + ha71 * self.k1[i]
+        + ha72 * self.k2[i]
+        + ha73 * self.k3[i]
+        + ha74 * self.k4[i]
+        + ha75 * self.k5[i]
+        + ha76 * self.k6[i];
     }
     (self.ode)(&(t + self.h * Self::C7), &self.wk, &mut self.k7);
 
     let mut sum_of_squared_err = 0.0;
+
+    let hb41 = self.h * Self::B41;
+    let hb42 = self.h * Self::B42;
+    let hb43 = self.h * Self::B43;
+    let hb44 = self.h * Self::B44;
+    let hb45 = self.h * Self::B45;
+    let hb46 = self.h * Self::B46;
+    let hb47 = self.h * Self::B47;
     for i in 0..LEN_Y {
       // y4
       self.y4[i] = y[i]
-        + self.h
-          * (Self::B41 * self.k1[i]
-            + Self::B42 * self.k2[i]
-            + Self::B43 * self.k3[i]
-            + Self::B44 * self.k4[i]
-            + Self::B45 * self.k5[i]
-            + Self::B46 * self.k6[i]
-            + Self::B47 * self.k7[i]);
+        + hb41 * self.k1[i]
+        + hb42 * self.k2[i]
+        + hb43 * self.k3[i]
+        + hb44 * self.k4[i]
+        + hb45 * self.k5[i]
+        + hb46 * self.k6[i]
+        + hb47 * self.k7[i];
 
       // y5
       dy[i] = Self::B51 * self.k1[i]
@@ -229,7 +245,7 @@ where
   }
 
   fn update_stepsize(&mut self, rms_err: f64) {
-    let ratio = 0.9 * ((1.0 / rms_err).powf(1.0 / Self::ORDER));
+    let ratio = 0.8 * ((1.0 / rms_err).powf(1.0 / Self::ORDER));
 
     if ratio < 0.25 {
       self.h *= 0.25;
@@ -237,6 +253,12 @@ where
       self.h *= ratio;
     } else {
       self.h *= 4.0;
+    }
+
+    if self.h < self.hmin {
+      self.h = self.hmin
+    } else if self.hmax < self.h {
+      self.h = self.hmax
     }
   }
 }

@@ -19,7 +19,7 @@ where
 {
   pub fn new(ode: Ode, options: &StepOptions) -> Self {
     let h = match options {
-      StepOptions::Default => 1e-3,
+      StepOptions::Default => 1e-2,
       StepOptions::Rk4 { h } => *h,
       _ => panic!("Invalid StepOptions variant."),
     };
@@ -43,15 +43,16 @@ where
   pub fn step(&mut self, t: &f64, y: &mut [f64; LEN_Y], dy: &mut [f64; LEN_Y]) {
     (self.ode)(t, y, &mut self.k1);
 
+    let h_half = self.h / 2.0;
     for i in 0..LEN_Y {
-      self.wk[i] = y[i] + self.k1[i] * self.h / 2.0;
+      self.wk[i] = y[i] + self.k1[i] * h_half;
     }
-    (self.ode)(&(t + 0.5 * self.h), &self.wk, &mut self.k2);
+    (self.ode)(&(t + h_half), &self.wk, &mut self.k2);
 
     for i in 0..LEN_Y {
-      self.wk[i] = y[i] + self.k2[i] * self.h / 2.0;
+      self.wk[i] = y[i] + self.k2[i] * h_half;
     }
-    (self.ode)(&(t + 0.5 * self.h), &self.wk, &mut self.k3);
+    (self.ode)(&(t + h_half), &self.wk, &mut self.k3);
 
     for i in 0..LEN_Y {
       self.wk[i] = y[i] + self.k3[i] * self.h;

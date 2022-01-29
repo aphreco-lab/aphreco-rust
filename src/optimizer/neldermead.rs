@@ -118,7 +118,7 @@ impl ConcreteOptimizer for NelderMead {
 
     if self.verbose {
       println!(
-        "{}:   f:{:.4e}    x{:10.5}",
+        "   {}:   f:{:.4e}    x{:10.8}",
         str_proc, &simplex[0].0, &simplex[0].1
       );
     }
@@ -129,7 +129,7 @@ impl ConcreteOptimizer for NelderMead {
       simplex.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
       if self.verbose {
         println!(
-          "{}:   f:{:.4e}    x{:10.5}",
+          "   {}:   f:{:.4e}    x{:10.8}",
           str_proc, &simplex[0].0, &simplex[0].1
         );
       }

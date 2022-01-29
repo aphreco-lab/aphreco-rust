@@ -103,7 +103,7 @@ impl ConcreteOptimizer for GeneticAlgorithm {
 
       // print
       if self.verbose {
-        println!("{:6}:   f:{:.4e}   x:{:10.5}", n_gen, pop[0].0, pop[0].1);
+        println!("{:5}:   f:{:.4e}   x:{:10.8}", n_gen, pop[0].0, pop[0].1);
       }
 
       // choose elite

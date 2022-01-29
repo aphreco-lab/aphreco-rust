@@ -2,14 +2,9 @@ use aphreco::prelude::*;
 
 fn main() {
   let model = Model::new();
-  let st_options = StepOptions::Dopri45 {
-    h0: 1e-4,
-    abstol: 1e-6,
-    reltol: 1e-6,
-    hmin: 1e-6,
-    hmax: 1e-2,
-  };
-  let stepper = Stepper::Dopri45(st_options);
+  let stepper_options = StepOptions::Default;
+  // let stepper = Stepper::Rk4(stepper_options);
+  let stepper = Stepper::Dopri45(stepper_options);
   let simulator = Simulator::new(model, stepper);
 
   let data = Data::new(obs());
@@ -22,7 +17,7 @@ fn main() {
     verbose: true,
   };
   let optimizer = Optimizer::GeneticAlgorithm(ga_options);
-  let optres = optimizer.run(&mut objective);
+  clock!(let optres = optimizer.run(&mut objective));
 
   objective.setx(&optres.x);
 
@@ -34,7 +29,7 @@ fn main() {
     verbose: true,
   };
   let optimizer = Optimizer::NelderMead(nm_options);
-  let optres = optimizer.run(&mut objective);
+  clock!(let optres = optimizer.run(&mut objective));
 
   optres.save("./");
 }
@@ -163,26 +158,26 @@ fn obs() -> Vec<(usize, f64, f64, Option<f64>, Option<f64>)> {
     // index, t, y, terr, yerr
 
     // A
-    (0, 0.0, 100.000, None, None),  // d[0]
-    (0, 0.1, 98.0248, None, None),  // d[1]
-    (0, 0.2, 96.0984, None, None),  // d[2]
-    (0, 0.5, 90.5998, None, None),  // d[3]
-    (0, 1.0, 82.3041, None, None),  // d[4]
-    (0, 2.0, 68.5225, None, None),  // d[5]
-    (0, 5.0, 42.9204, None, None),  // d[6]
-    (0, 10.0, 26.5668, None, None), // d[7]
-    (0, 20.0, 20.5390, None, None), // d[8]
-    (0, 50.0, 20.0003, None, None), // d[9]
+    (0, 0.0, 100.0, None, None),             // d[0]
+    (0, 0.1, 98.0247929622666, None, None),  // d[1]
+    (0, 0.2, 96.0983539600571, None, None),  // d[2]
+    (0, 0.5, 90.5997522067676, None, None),  // d[3]
+    (0, 1.0, 82.3040626457124, None, None),  // d[4]
+    (0, 2.0, 68.5224527770107, None, None),  // d[5]
+    (0, 5.0, 42.9203837488152, None, None),  // d[6]
+    (0, 10.0, 26.5667998899119, None, None), // d[7]
+    (0, 20.0, 20.5390357599268, None, None), // d[8]
+    (0, 50.0, 20.0002981322538, None, None), // d[9]
     // B
-    (1, 0.0, 0.00000, None, None),  // d[10]
-    (1, 0.1, 1.9752, None, None),   // d[11]
-    (1, 0.2, 3.9016, None, None),   // d[12]
-    (1, 0.5, 9.4002, None, None),   // d[13]
-    (1, 1.0, 17.6959, None, None),  // d[14]
-    (1, 2.0, 31.4775, None, None),  // d[15]
-    (1, 5.0, 57.0796, None, None),  // d[16]
-    (1, 10.0, 73.4332, None, None), // d[17]
-    (1, 20.0, 79.4610, None, None), // d[18]
-    (1, 50.0, 79.9997, None, None), // d[19]
+    (1, 0.0, 0.0, None, None),               // d[10]
+    (1, 0.1, 1.97520703773339, None, None),  // d[11]
+    (1, 0.2, 3.90164603994288, None, None),  // d[12]
+    (1, 0.5, 9.40024779323236, None, None),  // d[13]
+    (1, 1.0, 17.6959373542876, None, None),  // d[14]
+    (1, 2.0, 31.4775472229893, None, None),  // d[15]
+    (1, 5.0, 57.0796162511848, None, None),  // d[16]
+    (1, 10.0, 73.4332001100881, None, None), // d[17]
+    (1, 20.0, 79.4609642400732, None, None), // d[18]
+    (1, 50.0, 79.9997018677462, None, None), // d[19]
   ]
 }
