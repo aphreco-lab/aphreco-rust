@@ -79,7 +79,7 @@ where
         1e-4, // default abstol
         1e-4, // default reltol
         1e-8, // default hmin
-        1e-2, // default hmax
+        1e-3, // default hmax
       ),
 
       StepOptions::Dopri45 {

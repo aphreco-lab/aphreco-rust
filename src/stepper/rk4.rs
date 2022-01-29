@@ -19,7 +19,7 @@ where
 {
   pub fn new(ode: Ode, options: &StepOptions) -> Self {
     let h = match options {
-      StepOptions::Default => 1e-2,
+      StepOptions::Default => 1e-3,
       StepOptions::Rk4 { h } => *h,
       _ => panic!("Invalid StepOptions variant."),
     };
