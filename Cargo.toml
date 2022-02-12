@@ -1,6 +1,6 @@
 [package]
 name = "aphreco"
-version = "0.1.4"
+version = "0.1.5"
 edition = "2021"
 authors = ["Satoshi Koyama"]
 repository = "https://github.com/aphreco-lab/aphreco-rust"
@@ -13,5 +13,4 @@ description = "A small-scale physiological modeling library"
 ndarray = "0.14.0"
 rust_decimal = "1.19.0"
 num-traits = { default-features = false, features = ["i128"], version = "0.2" }
-chrono = "0.4.19"
 rand = "0.8.4"
