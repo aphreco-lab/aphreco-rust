@@ -1,4 +1,4 @@
-use chrono::{DateTime, Local};
+// use chrono::{DateTime, Local};
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
@@ -26,9 +26,10 @@ impl<const LEN_Y: usize> SimResult<LEN_Y> {
       str_result.push('\n');
     }
 
-    let datetime: DateTime<Local> = Local::now();
-    let now_str = datetime.format("%Y%m%d_%H%M%S%.3f").to_string();
-    let file_name = String::from("Sim_") + &now_str + ".csv";
+    // let datetime: DateTime<Local> = Local::now();
+    // let now_str = datetime.format("%Y%m%d_%H%M%S%.3f").to_string();
+    // let file_name = String::from("Sim_") + &now_str + ".csv";
+    let file_name = String::from("simres.csv");
     let save_path = save_dir.join(file_name);
 
     // Write string into a file
