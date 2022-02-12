@@ -14,7 +14,7 @@ fn main() {
 
   let simulator = Simulator::new(model, stepper);
 
-  let sampling_time = sampling_time();
+  let sampling_time = smptime();
   clock!(let simres = simulator.run(&sampling_time));
   simres.save("./");
 }
@@ -103,10 +103,10 @@ impl SimModelTrait<LEN_Y, LEN_P, LEN_B> for Model {
   }
 }
 
-fn sampling_time() -> Vec<f64> {
-  let mut vec_smp_t = Vec::new();
+fn smptime() -> Vec<f64> {
+  let mut vec_smptime = Vec::new();
   for i in 0..=5000 {
-    vec_smp_t.push(i as f64 / 100.0);
+    vec_smptime.push(i as f64 / 100.0);
   }
-  vec_smp_t
+  vec_smptime
 }
