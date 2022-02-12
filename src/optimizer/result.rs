@@ -1,4 +1,3 @@
-// use chrono::{DateTime, Local};
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
@@ -27,9 +26,6 @@ impl OptResult {
       str_result.push('\n');
     }
 
-    // let datetime: DateTime<Local> = Local::now();
-    // let now_str = datetime.format("%Y%m%d_%H%M%S%.3f").to_string();
-    // let file_name = String::from("Opt_") + &now_str + ".csv";
     let file_name = String::from("optres.csv");
     let save_path = save_dir.join(file_name);
 
