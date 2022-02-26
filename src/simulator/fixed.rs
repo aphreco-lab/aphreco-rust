@@ -7,7 +7,6 @@ use core::str::FromStr;
 use num_traits::ToPrimitive;
 use rust_decimal::Decimal;
 use std::collections::VecDeque;
-use std::time::{Duration, Instant};
 
 #[derive(Clone)]
 pub struct Simulator<M, const LEN_Y: usize, const LEN_P: usize, const LEN_B: usize>
@@ -28,15 +27,7 @@ where
   }
 
   pub fn run(&self, smp_t: &Vec<f64>) -> SimResult<LEN_Y> {
-    // ***time measurement***
-    let mut time_ini = Duration::new(0, 0);
-    let mut time_rec = Duration::new(0, 0);
-    let mut time_ode = Duration::new(0, 0);
-    let mut time_step = Duration::new(0, 0);
-    let mut time_push = Duration::new(0, 0);
-
     // initialize
-    let clock_start = Instant::now(); // ***time measurement***
     let (ini_t, ini_y) = self.model.init();
     let beats = self.model.beat(&ini_t, &ini_y);
     let (end_t, mut vdq_smp_t, mut dec_times) = self.initialize_times(&ini_t, smp_t, &beats);
@@ -64,12 +55,7 @@ where
     // for determining the end time of ODE solving in each loop.
     let mut next_t: f64;
 
-    let clock_end = Instant::now(); // ***time measurement***
-    time_ini += clock_end.duration_since(clock_start); // ***time measurement***
-
     loop {
-      let clock_start = Instant::now(); // ***time measurement***
-
       // update act to be used in REC calculation
       // update dec_next_t in dec_times for next loop
       // next_t is the end of the ODE solving
@@ -77,18 +63,14 @@ where
 
       // calculate REC
       self.solve_rec(&cur_t, &mut cur_y, &mut delta_y, &act);
-      let clock_end = Instant::now(); // ***time measurement***
-      time_rec += clock_end.duration_since(clock_start); // ***time measurement***
 
       // judge end
       if cur_t >= end_t {
         break;
       }
 
-      let clock_start = Instant::now(); // ***time measurement***
-
       // integrate ODE and store the calculated y to the res_y
-      let (t_step, t_push) = self.solve_ode(
+      self.solve_ode(
         &mut stepper,
         &cur_t,
         &next_t,
@@ -98,26 +80,12 @@ where
         &mut res_y,
       );
 
-      let clock_end = Instant::now(); // ***time measurement***
-      time_ode += clock_end.duration_since(clock_start); // ***time measurement***
-      time_step += t_step; // ***time measurement***
-      time_push += t_push; // ***time measurement***
-
       // make a progress to the next loop
       cur_t = next_t;
     }
 
     // store the last values
     res_y.push(cur_y);
-
-    // ***time measurement***
-    if false {
-      println!("Ini  : {:.10}", time_ini.as_secs_f32());
-      println!("Rec  : {:.10}", time_rec.as_secs_f32());
-      println!("Ode  : {:.10}", time_ode.as_secs_f32());
-      println!("Step : {:.10}", time_step.as_secs_f32());
-      println!("Push : {:.10}", time_push.as_secs_f32());
-    }
 
     SimResult::new(smp_t.clone(), res_y)
   }
@@ -240,13 +208,9 @@ where
     cur_y: &mut [f64; LEN_Y],
     deriv_y: &mut [f64; LEN_Y],
     res_y: &mut Vec<[f64; LEN_Y]>,
-  ) -> (Duration, Duration)
-  where
+  ) where
     ODE: Fn(&f64, &[f64; LEN_Y], &mut [f64; LEN_Y]),
   {
-    let mut time_step = Duration::new(0, 0); // ***time measurement***
-    let mut time_push = Duration::new(0, 0); // ***time measurement***
-
     let mut cur_t = ini_t.clone();
 
     let mut new_t: f64;
@@ -256,18 +220,13 @@ where
     let mut out_y = [0f64; LEN_Y];
 
     loop {
-      let clock_start = Instant::now(); // ***time measurement***
-
       // evaluate derivative
       new_t = stepper.run(&cur_t, &mut new_y, deriv_y);
-      let clock_end = Instant::now(); // ***time measurement***
-      time_step += clock_end.duration_since(clock_start); // ***time measurement***
 
       // keep constant relation (cre)
-      self.model.cre(&cur_t, &mut new_y);
+      self.model.cre(&new_t, &mut new_y);
 
       // store results
-      let clock_start = Instant::now(); // ***time measurement***
       loop {
         if vdq_smp_t.len() == 0 {
           println!("All sample points have been collected.");
@@ -292,8 +251,6 @@ where
           break;
         }
       }
-      let clock_end = Instant::now(); // ***time measurement***
-      time_push += clock_end.duration_since(clock_start); // ***time measurement***
 
       // make progress to the next loop
       cur_t = new_t;
@@ -302,18 +259,11 @@ where
       if new_t > *end_t {
         break;
       }
-
-      // store results at the end_t
-      for i in 0..LEN_Y {
-        cur_y[i] = cur_y[i] + (end_t - cur_t) * deriv_y[i];
-      }
     }
 
     // store results at the end_t
     for i in 0..LEN_Y {
       cur_y[i] = cur_y[i] + (end_t - cur_t) * deriv_y[i];
     }
-
-    (time_step, time_push) // ***time measurement***
   }
 }
