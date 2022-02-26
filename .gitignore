@@ -2,7 +2,7 @@
 Cargo.lock
 
 # result files in examples
-examples/Sim*
-examples/Opt*
-Opt_*
-Sim_*
+examples/simres.csv
+examples/optres.csv
+simres.csv
+optres.csv
