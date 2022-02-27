@@ -56,13 +56,18 @@ where
     let mut next_t: f64;
 
     loop {
-      // update act to be used in REC calculation
-      // update dec_next_t in dec_times for next loop
-      // next_t is the end of the ODE solving
-      next_t = self.evaluate_condition(&cur_t, &cur_y, &beats, &mut act, &mut dec_times);
+      if LEN_B == 0 {
+        // if no beat, calculate ode to the end.
+        next_t = end_t;
+      } else {
+        // update act to be used in REC calculation
+        // update dec_next_t in dec_times for next loop
+        // next_t is the end of the ODE solving
+        next_t = self.evaluate_condition(&cur_t, &cur_y, &beats, &mut act, &mut dec_times);
 
-      // calculate REC
-      self.solve_rec(&cur_t, &mut cur_y, &mut delta_y, &act);
+        // calculate REC
+        self.solve_rec(&cur_t, &mut cur_y, &mut delta_y, &act);
+      }
 
       // judge end
       if cur_t >= end_t {
